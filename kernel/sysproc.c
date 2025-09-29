@@ -99,6 +99,7 @@ sys_uptime(void)
   return xticks;
 }
 
+// Implementación de la syscall getppid
 uint64
 sys_getppid(void)
 {
