@@ -36,4 +36,4 @@ entry("getpid");
 entry("sbrk");
 entry("sleep");
 entry("uptime");
-entry("getppid");
+entry("getppid"); # Nueva entrada para getppid para que el compilador genere el stub en ensamblador
