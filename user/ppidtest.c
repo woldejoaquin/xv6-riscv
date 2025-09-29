@@ -2,6 +2,7 @@
 #include "kernel/stat.h"
 #include "user/user.h"
 
+// Programa de prueba para la syscall getppid
 int
 main(void)
 {
