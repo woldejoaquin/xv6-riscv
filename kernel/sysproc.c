@@ -113,3 +113,31 @@ sys_getppid(void)
 
   return ppid;
 }
+
+uint64
+sys_settickets(void)
+{
+  int n; // Variable para almacenar el número de tickets
+  struct proc *p = myproc(); 
+
+  // Leer el argumento entero (n) desde el espacio de usuario
+  argint(0, &n);
+
+  // Aplicar la regla de robustez: si n < 1, asignar 1
+  if (n < 1) {
+    n = 1;
+  }
+
+  acquire(&p->lock);
+  p->tickets = n;
+  // printf("[Kernel sys_settickets] PID %d asignó %d tickets\n", p->pid, p->tickets);
+  release(&p->lock);
+  
+  return 0;
+}
+
+uint64
+sys_get_slices(void)
+{
+  return myproc()->run_slices;
+}

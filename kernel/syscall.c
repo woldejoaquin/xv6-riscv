@@ -102,6 +102,8 @@ extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 extern uint64 sys_getppid(void); // Se agrego el prototipo para getppid
+extern uint64 sys_settickets(void); // Se agrego el prototipo para settickets
+extern uint64 sys_get_slices(void); // Se agrego el prototipo para get_slices
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -128,6 +130,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_getppid] sys_getppid, // Se agrego la funcion getppid al arreglo
+[SYS_settickets] sys_settickets, // Se agrego la funcion settickets al arreglo
+[SYS_get_slices] sys_get_slices, // Se agrego la funcion get_slices al arreglo
 };
 
 void

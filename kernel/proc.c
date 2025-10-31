@@ -125,6 +125,10 @@ found:
   p->pid = allocpid();
   p->state = USED;
 
+  // INICIALIZACIÓN DE NUEVOS CAMPOS
+  p->tickets = 100;     // Inicializar con 100 tickets
+  p->run_slices = 0;  // Inicializar contador en 0
+
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
     freeproc(p);
@@ -415,45 +419,77 @@ wait(uint64 addr)
 //  - swtch to start running that process.
 //  - eventually that process transfers control
 //    via swtch back to the scheduler.
+
+// Generador aleatorio simple
+static unsigned int next_rand = 1;
+
+static int
+rand(void)
+{
+  next_rand = next_rand * 1103515245 + 12345;
+  return (unsigned int)(next_rand / 65536) % 32768;
+}
+
 void
 scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-
   c->proc = 0;
+
   for(;;){
-    // The most recent process to run may have had interrupts
-    // turned off; enable them to avoid a deadlock if all
-    // processes are waiting. Then turn them back off
-    // to avoid a possible race between an interrupt
-    // and wfi.
     intr_on();
     intr_off();
 
-    int found = 0;
+    // Calcular Total Tickets
+    int total_tickets = 0;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
-        found = 1;
+        // printf("[Kernel scheduler] PID %d (RUNNABLE) tiene %d tickets\n", p->pid, p->tickets);
+        total_tickets += p->tickets;
       }
       release(&p->lock);
     }
-    if(found == 0) {
-      // nothing to run; stop running on this core until an interrupt.
+
+    if(total_tickets == 0) {
       asm volatile("wfi");
+      continue; 
     }
-  }
+
+    // Generar un ticket ganador entre
+    int winning_ticket = (rand() % total_tickets) + 1;
+    int accumulated_tickets = 0;
+
+    // Encontrar y Ejecutar al Ganador
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock); 
+
+      if(p->state == RUNNABLE) {
+        accumulated_tickets += p->tickets;
+
+        if(accumulated_tickets >= winning_ticket) {
+          
+          p->run_slices++; 
+
+          // Lógica de ejecución
+          p->state = RUNNING;
+          c->proc = p;
+          swtch(&c->context, &p->context);
+
+          c->proc = 0;
+          
+          release(&p->lock); 
+          
+          goto next_lottery_cycle; 
+        }
+      }
+
+      release(&p->lock);
+    }
+
+    next_lottery_cycle: ;
+  } 
 }
 
 // Switch to scheduler.  Must hold only p->lock

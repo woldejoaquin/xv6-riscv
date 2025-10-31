@@ -23,6 +23,8 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int getppid(void); // Se agregó la declaración de la función getppid
+int settickets(int); // Se agregó la declaración de la función settickets
+int get_slices(void); // Se agregó la declaración de la función get_slices
 
 // ulib.c
 int stat(const char*, struct stat*);

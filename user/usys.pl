@@ -37,3 +37,5 @@ entry("sbrk");
 entry("sleep");
 entry("uptime");
 entry("getppid"); # Nueva entrada para getppid para que el compilador genere el stub en ensamblador
+entry("settickets"); # Nueva entrada para settickets
+entry("get_slices"); # Nueva entrada para get_slices

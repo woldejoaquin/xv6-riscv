@@ -21,3 +21,5 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 #define SYS_getppid  22 // Se agrego este define para getppid
+#define SYS_settickets 23 // Se agrego este define para settickets
+#define SYS_get_slices 24 // Se agrego este define para get_slices
