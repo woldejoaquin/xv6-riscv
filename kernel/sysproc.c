@@ -98,3 +98,31 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_mrdprotect(void)
+{
+  uint64 addr;
+  int len;
+
+  if(argaddr(0, &addr) < 0) || argint(1, &len) < 0)
+    return -1;
+
+  printf("Syscall mrdprotect llamada: addr=%p, len: %d\n", addr, len);
+
+  return 0;
+}
+
+uint64
+sys_munrdprotect(void)
+{
+  uint64 addr;
+  int len;
+
+  if(argaddr(0, &addr) < 0 || argint(1, &len) < 0)
+    return -1;
+
+  printf("Syscall munrdprotect llamada: addr=%p, len=%d\n", addr, len);
+
+  return 0;
+}
