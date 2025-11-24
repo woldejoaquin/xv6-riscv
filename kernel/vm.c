@@ -485,3 +485,40 @@ ismapped(pagetable_t pagetable, uint64 va)
   }
   return 0;
 }
+
+int
+uvm_rdprotect(pagetable_t pagetable, uint64 va, int len, int protect)
+{
+  uint64 a;
+  pte_t *pte;
+
+  // Validaciones básicas
+  if(len <= 0) 
+    return -1;
+    
+  if(va % PGSIZE != 0)  
+    return -1;
+
+  // Recorrer el rango de páginas
+  for(a = va; a < va + len; a += PGSIZE){
+  
+    if((pte = walk(pagetable, a, 0)) == 0)
+      return -1;
+
+    // Verificar bits de validez y usuario
+    if((*pte & PTE_V) == 0 || (*pte & PTE_U) == 0)
+      return -1;
+
+    // Modificar el bit PTE_R
+    if(protect) {
+      *pte &= ~PTE_R;
+    } else {
+      *pte |= PTE_R;
+    }
+  }
+
+  // Flush del TLB
+  asm volatile("sfence.vma"); 
+
+  return 0;
+}

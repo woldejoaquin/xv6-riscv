@@ -105,10 +105,11 @@ sys_mrdprotect(void)
   uint64 addr;
   int len;
 
-  if(argaddr(0, &addr) < 0) || argint(1, &len) < 0)
-    return -1;
+  argaddr(0, &addr);
+  argint(1, &len);
 
-  printf("Syscall mrdprotect llamada: addr=%p, len: %d\n", addr, len);
+  if(uvm_rdprotect(myproc()->pagetable, addr, len, 1) < 0)
+    return -1;
 
   return 0;
 }
@@ -118,11 +119,12 @@ sys_munrdprotect(void)
 {
   uint64 addr;
   int len;
+  
+  argaddr(0, &addr);
+  argint(1, &len);
 
-  if(argaddr(0, &addr) < 0 || argint(1, &len) < 0)
+  if(uvm_rdprotect(myproc()->pagetable, addr, len, 0) < 0)
     return -1;
-
-  printf("Syscall munrdprotect llamada: addr=%p, len=%d\n", addr, len);
 
   return 0;
 }
