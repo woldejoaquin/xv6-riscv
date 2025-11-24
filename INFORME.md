@@ -1,4 +1,4 @@
-# Informe de Instalación y Ejecución de xv6
+# Informe de Protección de Lectura en xv6
 
 **Integrantes:** Joaquín Wolde, Agustín de la Vega
 
@@ -6,7 +6,7 @@
 
 ### Introducción
 
-Este documento describe el procedimiento realizado para instalar y ejecutar el sistema operativo educativo **xv6**. El objetivo fue familiarizarnos con la compilación y el funcionamiento de un sistema operativo simple. Para ello, se utilizó el **Subsistema de Windows para Linux (WSL)** con **Ubuntu** como entorno de desarrollo y el emulador **QEMU** para la virtualización.
+Este documento describe la implementación de un mecanismo de protección de lectura en el sistema operativo xv6. El objetivo fue desarrollar un modelo de memoria de "solo escritura", diseñado para resguardar datos sensibles como claves criptográficas y credenciales. Para ello, se modificaron las estructuras de paginación del kernel, incorporando las llamadas al sistema `mrdprotect` y `munrdprotect` para manipular directamente los permisos en las tablas de páginas
 
 ---
 
