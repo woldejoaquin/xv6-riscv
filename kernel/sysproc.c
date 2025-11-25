@@ -108,10 +108,7 @@ sys_mrdprotect(void)
   argaddr(0, &addr);
   argint(1, &len);
 
-  if(uvm_rdprotect(myproc()->pagetable, addr, len, 1) < 0)
-    return -1;
-
-  return 0;
+  return change_read_protection(addr, len, 0);
 }
 
 uint64
@@ -119,12 +116,9 @@ sys_munrdprotect(void)
 {
   uint64 addr;
   int len;
-  
+
   argaddr(0, &addr);
   argint(1, &len);
 
-  if(uvm_rdprotect(myproc()->pagetable, addr, len, 0) < 0)
-    return -1;
-
-  return 0;
+  return change_read_protection(addr, len, 1);
 }

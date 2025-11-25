@@ -487,38 +487,42 @@ ismapped(pagetable_t pagetable, uint64 va)
 }
 
 int
-uvm_rdprotect(pagetable_t pagetable, uint64 va, int len, int protect)
+change_read_protection(uint64 addr, int len, int enable)
 {
-  uint64 a;
+  struct proc *p = myproc();
   pte_t *pte;
+  uint64 va;
+  uint64 end;
 
-  // Validaciones básicas
-  if(len <= 0) 
+  // addr alineada a página y len positivo
+  if(addr % PGSIZE != 0 || len <= 0)
     return -1;
+
+  // El rango va desde addr hasta addr + len * PGSIZE
+  end = addr + (len * PGSIZE); 
+
+  // Iterar página por página
+  for(va = addr; va < end; va += PGSIZE){
     
-  if(va % PGSIZE != 0)  
-    return -1;
-
-  // Recorrer el rango de páginas
-  for(a = va; a < va + len; a += PGSIZE){
-  
-    if((pte = walk(pagetable, a, 0)) == 0)
+    // Dentro del espacio de usuario
+    if(va >= MAXVA)
       return -1;
 
-    // Verificar bits de validez y usuario
-    if((*pte & PTE_V) == 0 || (*pte & PTE_U) == 0)
+    pte = walk(p->pagetable, va, 0);
+
+    // Verificar si la página existe (PTE_V) y es de usuario (PTE_U)
+    if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0)
       return -1;
 
-    // Modificar el bit PTE_R
-    if(protect) {
-      *pte &= ~PTE_R;
+    // Modificar los bits
+    if(enable) {
+      *pte |= PTE_R; 
     } else {
-      *pte |= PTE_R;
+      *pte &= ~PTE_R;
     }
   }
-
-  // Flush del TLB
-  asm volatile("sfence.vma"); 
-
+  
+  sfence_vma(); 
+  
   return 0;
 }

@@ -169,7 +169,7 @@ int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
 int             ismapped(pagetable_t, uint64);
 uint64          vmfault(pagetable_t, uint64, int);
-int             uvm_rdprotect(pagetable_t, uint64, int, int);
+int change_read_protection(uint64 addr, int len, int enable);
 
 // plic.c
 void            plicinit(void);
